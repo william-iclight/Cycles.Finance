@@ -1,6 +1,6 @@
 # Cycles.Finance
 
 **Canister id**: ium3d-eqaaa-aaaak-aab4q-cai  
-**Module hash**: 50f7396f193e18de00cf29bb9541c121d179308bb30bf57839cf0afc21e7c34b  
+**Module hash**: 73e1a8f888c91abe086fedc24fe660d9cf068c2d78f6b172dd58f92cd5b503f6  
 
 Documentation, UI interface, and open source code will be provided soon...
