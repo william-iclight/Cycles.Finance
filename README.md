@@ -38,6 +38,36 @@ Liquidity provider returns.
 - - The ICP/Cycles rate for this canister is automatically formed by the market and may deviate from other markets.
 - Interaction with this canister requires your `ICP account Principal` and `Cycles wallet account Principal`, please note the difference between the two.
 
+### Query ICP/Cycles swap ratio
+````
+dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(null)'
+````
+The `e8s` (or `5_035_232`) field in the return value is divided by the `cycles` (or `2_190_693_645`) field to indicate how many cycles can be exchanged for 1 e8s. This value is multiplied by 10^8 to indicate how many cycles can be exchanged for 1 icp. this is an estimate.
+````
+(
+  record {
+    icp = record { e8s = 787_146_478 : nat64 };
+    vol = record {
+      swapIcpVol = 1_740_878 : nat;
+      swapCyclesVol = 573_069_740_022 : nat;
+    };
+    shareWeighted = record {
+      updateTime = 1_638_592_854 : nat;
+      shareTimeWeighted = 3_894_326_391_123 : nat;
+    };
+    unitValue = record { 329155.999121 : float64; 0.972376 : float64 };
+    share = 809_508_285 : nat;
+    cycles = 266_454_525_225_963 : nat;
+    priceWeighted = record {
+      updateTime = 1_638_592_854 : nat;
+      icpTimeWeighted = 3_800_565_037_457 : nat;
+      cyclesTimeWeighted = 1_277_301_377_584_917_917 : nat;
+    };
+    swapCount = 0 : nat64;
+  },
+)
+````
+
 ### ICP to Cycles
 
 Step1: Get your dedicated ICP deposit account-id (**DepositAccountId**)
@@ -147,7 +177,7 @@ Return (example). The `share` (or `2_082_268_383`) field indicates the share of 
 
 ### Remove liquidity
 
-Step1: Query your liquidity share, the `share` (or `2_082_268_383`) field is the current share held.
+Step1: Query your liquidity share, the `share` (or `2_082_268_383`) field in the return is the your share held.
 
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt principal "<your_icp_account_principal>")'
