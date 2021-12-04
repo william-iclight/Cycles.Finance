@@ -1,125 +1,125 @@
 # Cycles.Finance
 
-### 申明：
+### Disclaimers.
 
-**项目正处于测试期，可能存在缺陷。这是一个Dapp，请了解相关知识，并自愿参与，自行承担所有风险。**
+**This project is in beta and may have defects.  It‘s a Dapp, please be knowledgeable and participate voluntarily and at your own risk.**
 
-##  概述
+##  Overview
 
-Cycles.Finance是一个ICP/Cycles去中心化市场，支持ICP、Cycles的双向兑换，采用乘法恒定K模型（A*B=K），类似UniSwapV2。
+Cycles.Finance is an ICP/Cycles marketplace that supports bidirectional exchange of ICP, Cycles, using a multiplicative constant K model (A*B=K), similar to UniSwapV2.
 
-#### 交易限制
+#### Restrictions on Swapping
 
-项目仍然处于测试期，为了控制风险，对单笔交易进行了限额。
-- ICP：单笔交易最大10 icp，最小10000 e8s。
-- Cycles：最大3*10^14 cycles，最小10^8 cycles。
-- 交易波动性限制：单笔交易引起价格波动超过20%会被拒绝。
+The project is still in beta and limits have been placed on a swap in order to control risk. 
+- ICP: max 10 icp per swap, min 10,000 e8s per swap.
+- Cycles: maximum 3*10^14 cycles per swap, minimum 10^8 cycles per swap.
+- Swap volatility limit: each swap causing price fluctuations of more than 20% will be rejected.
  
-#### 交易费用
+#### Swap fees
 
-交易费：1%，采取后收费模式，收取ICP或者Cycles。  
-交易费用途：收取的ICP全部进入流动性奖励池，收取的Cycles的80%进入流动性奖励池（另外20%用于Canister的消耗）。
+Swapping fee: 1%, on a post-fee model, charged for ICPs or Cycles.  
+Swapping fee usage: All ICP charged goes into the liquidity reward pool, 80% of Cycles charged goes into the liquidity reward pool (the other 20% is used for Canister gas).
 
-#### 流动性做市
+#### Liquidity (AMM)
 
-做市模型：AMM自动做市模型。采用乘法恒定K模型（AB=K）。  
-流动性做市收益：  
-- 流动性提供者按照持有份额的时间加权比例分配流动性奖励池资产。 
-- [计划] 参与ICLighthouse流动性挖矿计划，获得ICL代币奖励。
+Market making model: automatic market making model(AMM). Using a multiplicative constant K model (AB=K).     
+Liquidity provider returns.  
+- Liquidity providers receive liquidity reward pool assets in proportion to the time-weighted share they hold.  
+- [Plan] Participate in the ICLighthouse liquidity mining program and receive ICL token rewards.
 
-## 使用
+## Usage
 
-**Cycles.Finance 容器ID：ium3d-eqaaa-aaaak-aab4q-cai**  
-**当前版本Module hash: 73e1a8f888c91abe086fedc24fe660d9cf068c2d78f6b172dd58f92cd5b503f6**  
+**Canister Id：ium3d-eqaaa-aaaak-aab4q-cai**  
+**Module hash: 73e1a8f888c91abe086fedc24fe660d9cf068c2d78f6b172dd58f92cd5b503f6**  
 
 **Notes**
-- ICP在本合约的基本单位是e8s，1 icp = 10^8 e8s;
-- IC网络的Cycles汇率会动态变化，盯住XDR价值，1 XDR = 10^12 cycles (价值约1.4 USD);
-- 本合约的ICP/Cycles汇率由市场自动形成，与其他市场可能存在偏差；
-- 与本合约交互需要使用你的`ICP账户Principal`和`Cycles钱包账户Principal`，请注意两者区别。
+- The basic unit of ICP in canister is e8s, 1 icp = 10^8 e8s;
+- The ICP/Cycles rate for the IC network changes dynamically and is pegged to the XDR value, 1 XDR = 10^12 cycles (value approx. 1.4 USD).
+- - The ICP/Cycles rate for this canister is automatically formed by the market and may deviate from other markets.
+- Interaction with this canister requires your `ICP account Principal` and `Cycles wallet account Principal`, please note the difference between the two.
 
-### ICP兑换成Cycles（icpToCycles）
+### ICP to Cycles
 
-Step1: 获取你专用的ICP充值地址（称之为**DepositAccountId**）
+Step1: Get your dedicated ICP deposit account-id (**DepositAccountId**)
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai getAccountId '(principal "<your_icp_account_principal>")'
 ````
-返回(示例)
+Return `DepositAccountId`(example)
 ````
 ("f2d1945ebc293bdc2cc6ef**************e84cf61f51ce6798fc4283") 
 ````
 
-Step2: 向`DepositAccountId`发送ICP
+Step2: Send ICP to `DepositAccountId`
 ````
 dfx ledger --network ic transfer <your_DepositAccountId> --memo 0 --e8s <icp_e8s_amount>
 ````
 
-Step3: 提取Cycles，参数`icp_e8s_amount`输入在Step2中发送的数量，`your_cycles_wallet_principal`输入你的cycles钱包的Principal（注意：不是你的ICP账户）。
+Step3: Converting to Cycles. Parameters `icp_e8s_amount` enter the amount sent in Step2 and `your_cycles_wallet_principal` enter the principal of your cycles wallet (note: not your ICP account principal).
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai icpToCycles '(<icp_e8s_amount>:nat,principal "<your_cycles_wallet_principal>",null)'
 ````
-查看你账户的余额变化
+Check your wallet balance
 ````
 dfx wallet --network ic balance
 ````
 
-### Cycles兑换成ICP（cyclesToIcp）
+### Cycles to ICP
 
-Step1: 使用didc工具编码参数。注：didc工具地址：https://github.com/dfinity/candid/tree/master/tools/didc
+Step1: Use the didc tool to encode the parameters. Note, didc tool resources: https://github.com/dfinity/candid/tree/master/tools/didc
 ````
 didc encode '(principal "<your_icp_account_principal>",null)' -t '(principal,opt blob)' -f blob
 ````
-返回`CallArgs`（示例）
+Return `CallArgs`(example)
 ````
 blob "DIDL\02n\01m{\02h\00\01\**************\88\01\e1\18\fd6G\02\00"
 ````
 
-Step2: 兑换成ICP。参数`cycles_amount`输入你想用于兑换的cycles数量，参数`call_args`输入Step1得到的`CallArgs`
+Step2: Converting to ICP. The parameter `cycles_amount` enters the amount of cycles you want to convert, and the parameter `call_args` enters the `CallArgs` obtained from Step1.
 ````
 dfx canister --network ic call <your_cycles_wallet_principal> wallet_call '(record {canister=principal "ium3d-eqaaa-aaaak-aab4q-cai"; method_name="cyclesToIcp"; cycles=<cycles_amount>:nat64; args=<call_args>})'
 ````
-查看你账户的余额变化
+Check your account balance
 ````
 dfx ledger --network ic balance
 ````
 
-### 添加流动性（add）
+### Add liquidity
 
-添加流动性操作，需要同时向流动性池子加入ICP和Cycles，比例根据当前价格计算，多余部分会退回。
+To add liquidity, both ICP and Cycles need to be added to the liquidity pool, the proportion is calculated based on the current price and the excess is returned.
 
-Step1: 获取你专用的ICP充值地址（称之为**DepositAccountId**）
+Step1: Get your dedicated ICP deposit account-id（**DepositAccountId**）
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai getAccountId '(principal "<your_icp_account_principal>")'
 ````
-返回(示例)
+Return (example)
 ````
 ("f2d1945ebc293bdc2cc6ef**************e84cf61f51ce6798fc4283") 
 ````
 
-Step2: 向`DepositAccountId`发送ICP
+Step2: Send ICP to `DepositAccountId`
 ````
 dfx ledger --network ic transfer <your_DepositAccountId> --memo 0 --e8s <icp_e8s_amount>
 ````
 
-Step3: 使用didc工具编码参数。注：didc工具地址：https://github.com/dfinity/candid/tree/master/tools/didc
+Step3: Use the didc tool to encode the parameters. Note, didc tool resources: https://github.com/dfinity/candid/tree/master/tools/didc
 ````
 didc encode '(principal "<your_icp_account_principal>",null)' -t '(principal,opt blob)' -f blob
 ````
-返回`CallArgs`（示例）
+Return `CallArgs`(example)
 ````
 blob "DIDL\02n\01m{\02h\00\01\**************\88\01\e1\18\fd6G\02\00"
 ````
 
-Step4: 发送Cycles，添加流动性。需要指定发送的Cycles数量，并填入Step3得到的`CallArgs`
+Step4: Send Cycles, add liquidity. You need to fill in the amount of Cycles to be sent and fill in the `CallArgs` obtained from Step3.
 ````
 dfx canister --network ic call <your_cycles_wallet_principal> wallet_call '(record {canister=principal "ium3d-eqaaa-aaaak-aab4q-cai"; method_name="add"; cycles=<cycles_amount>:nat64; args=<call_args>})'
 ````
 
-Step5: 查询持有流动性份额
+Step5: Enquire about holding liquidity shares
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt principal "<your_icp_account_principal>")'
 ````
-返回（示例）
+Return (example). The `share` (or `2_082_268_383`) field indicates the share of liquidity you hold.
 ````
 (
   record {
@@ -133,7 +133,7 @@ dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt princ
       shareTimeWeighted = 695_045_889_662 : nat;
     };
     unitValue = record { 329748.544469 : float64; 0.970629 : float64 };
-    share = 49_990_000 : nat;   //注：`share`(或`2_082_268_383`)表示你的流动性份额.
+    share = 49_990_000 : nat;   
     cycles = 16_484_143_085_896 : nat;
     priceWeighted = record {
       updateTime = 1_638_528_867 : nat;
@@ -145,38 +145,38 @@ dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt princ
 )
 ````
 
-### 提取流动性（remove）
+### Remove liquidity
 
-Step1: 查询自己的流动性份额，`share`(或`2_082_268_383`)字段为当前所占份额。
+Step1: Query your liquidity share, the `share` (or `2_082_268_383`) field is the current share held.
 
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt principal "<your_icp_account_principal>")'
 ````
 
-Step2: 提取流动性. 参数`share_amount`必须是等于或小于Step1查询到的数值, 参数`your_cycles_wallet_principal`用于接收cycles。
+Step2: Remove liquidity. The parameter `share_amount` must be equal to or less than the value queried by Step1, and the parameter `your_cycles_wallet_principal` is wallet principal used to receive the cycles.
 
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai remove '(<share_amount>:nat, principal "<your_cycles_wallet_principal>", null)'
 ````
-查看你账户的余额变化
+Check your account balance
 ````
 dfx ledger --network ic balance
 dfx wallet --network ic balance
 ````
 
-### 提取流动性做市收益（claimReturns）
+### Claim Rewards
 
-提取收益。需指定`your_cycles_wallet_principal`
+Claim Returns. Specify`your_cycles_wallet_principal`
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai claimReturns '(principal "<your_cycles_wallet_principal>", null)'
 ````
-查看你账户的余额变化
+Check your account balance
 ````
 dfx ledger --network ic balance
 dfx wallet --network ic balance
 ````
 
-## did文件
+## DID
 
 ````
 type Vol = record { swapCyclesVol: nat; swapIcpVol: nat; };
@@ -230,16 +230,16 @@ service : () -> CyclesMarket
 ````
 
 
-## 路线图
+## Roadmap
 
-(doing) 开发UI界面，开源合约代码；
+(doing) Development of UI interface, open source contract code.
 
-升级至V2.0版本，交易记录可扩展性存储；
+Upgrade to v2.0 with scalable storage of transaction records.
 
-推出ICL代币，开启流动性挖矿。
+Opening up liquidity mining.
 
 
-## 关于我们
+## Community
 
 Web: https://cycles.finance/  
 
