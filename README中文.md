@@ -38,6 +38,36 @@ Cycles.Finance是一个ICP/Cycles去中心化市场，支持ICP、Cycles的双�
 - 本合约的ICP/Cycles汇率由市场自动形成，与其他市场可能存在偏差；
 - 与本合约交互需要使用你的`ICP账户Principal`和`Cycles钱包账户Principal`，请注意两者区别。
 
+### 查询ICP/Cycles兑换比例
+````
+dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(null)'
+````
+返回值中的`e8s`(或`5_035_232`)字段 除以 `cycles`(或`2_190_693_645`)字段，就表示当前1个e8s可以兑换多少个cycles，乘以10^8就表示1个icp可以兑换多少个cycles，这是个估算值。
+````
+(
+  record {
+    icp = record { e8s = 787_146_478 : nat64 };
+    vol = record {
+      swapIcpVol = 1_740_878 : nat;
+      swapCyclesVol = 573_069_740_022 : nat;
+    };
+    shareWeighted = record {
+      updateTime = 1_638_592_854 : nat;
+      shareTimeWeighted = 3_894_326_391_123 : nat;
+    };
+    unitValue = record { 329155.999121 : float64; 0.972376 : float64 };
+    share = 809_508_285 : nat;
+    cycles = 266_454_525_225_963 : nat;
+    priceWeighted = record {
+      updateTime = 1_638_592_854 : nat;
+      icpTimeWeighted = 3_800_565_037_457 : nat;
+      cyclesTimeWeighted = 1_277_301_377_584_917_917 : nat;
+    };
+    swapCount = 0 : nat64;
+  },
+)
+````
+
 ### ICP兑换成Cycles（icpToCycles）
 
 Step1: 获取你专用的ICP充值地址（称之为**DepositAccountId**）
@@ -147,7 +177,7 @@ dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt princ
 
 ### 提取流动性（remove）
 
-Step1: 查询自己的流动性份额，`share`(或`2_082_268_383`)字段为当前所占份额。
+Step1: 查询自己的流动性份额，返回值中的`share`(或`2_082_268_383`)字段为当前所占份额。
 
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt principal "<your_icp_account_principal>")'
