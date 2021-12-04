@@ -38,7 +38,7 @@ Liquidity provider returns.
 - - The ICP/Cycles rate for this canister is automatically formed by the market and may deviate from other markets.
 - Interaction with this canister requires your `ICP account Principal` and `Cycles wallet account Principal`, please note the difference between the two.
 
-### Query ICP/Cycles swap ratio
+### Query ICP/Cycles price
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(null)'
 ````
@@ -177,7 +177,7 @@ Return (example). The `share` (or `2_082_268_383`) field indicates the share of 
 
 ### Remove liquidity
 
-Step1: Query your liquidity share, the `share` (or `2_082_268_383`) field in the return is the your share held.
+Step1: Query your liquidity share, the `share` (or `2_082_268_383`) field in the return is your share held.
 
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt principal "<your_icp_account_principal>")'
@@ -196,7 +196,7 @@ dfx wallet --network ic balance
 
 ### Claim Rewards
 
-Claim Returns. Specify`your_cycles_wallet_principal`
+Claim Returns. Specifying `your_cycles_wallet_principal`
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai claimReturns '(principal "<your_cycles_wallet_principal>", null)'
 ````
