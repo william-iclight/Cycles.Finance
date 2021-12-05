@@ -35,7 +35,7 @@ Liquidity reward pool:
 **Notes**
 - The basic unit of ICP in canister is e8s, 1 icp = 10^8 e8s;
 - The ICP/Cycles rate on IC network changes dynamically and is pegged to the XDR value, 1 XDR = 10^12 cycles (value approx. 1.4 USD).
-- - The ICP/Cycles rate on this canister is automatically formed by the market and may deviate from other markets.
+- The ICP/Cycles rate on this canister is automatically formed by the market and may deviate from other markets.
 - Your `ICP account principal` and `Cycles wallet account principal` are used to interact with this canister, please note the difference between them.
 
 ### Query ICP/Cycles price
