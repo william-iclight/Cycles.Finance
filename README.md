@@ -11,20 +11,20 @@ Cycles.Finance is an ICP/Cycles marketplace that supports bidirectional exchange
 #### Restrictions on Swapping
 
 The project is still in beta and limits have been placed on a swap in order to control risk. 
-- ICP: max 10 icp per swap, min 10,000 e8s per swap.
-- Cycles: maximum 3*10^14 cycles per swap, minimum 10^8 cycles per swap.
-- Swap volatility limit: each swap causing price fluctuations of more than 20% will be rejected.
+- ICP: max 10 icp each swap, min 10,000 e8s each swap.
+- Cycles: maximum 3*10^14 cycles each swap, minimum 10^8 cycles each swap.
+- Swap volatility limit: each swap causing price fluctuations more than 20% will be rejected.
  
 #### Swap fees
 
 Swapping fee: 1%, on a post-fee model, charged for ICPs or Cycles.  
-Swapping fee usage: All ICP charged goes into the liquidity reward pool, 80% of Cycles charged goes into the liquidity reward pool (the other 20% is used for Canister gas).
+Swapping fee usage: All ICP charged is moved to the liquidity reward pool, 80% of Cycles charged is moved to the liquidity reward pool (the other 20% is used for Canister gas).
 
 #### Liquidity (AMM)
 
 Market making model: automatic market making model(AMM). Using a multiplicative constant K model (AB=K).     
-Liquidity provider returns.  
-- Liquidity providers receive liquidity reward pool assets in proportion to the time-weighted share they hold.  
+Liquidity reward pool:  
+- Liquidity providers receive liquidity rewards in proportion to the time-weighted share they hold.  
 - [Plan] Participate in the ICLighthouse liquidity mining program and receive ICL token rewards.
 
 ## Usage
@@ -34,9 +34,9 @@ Liquidity provider returns.
 
 **Notes**
 - The basic unit of ICP in canister is e8s, 1 icp = 10^8 e8s;
-- The ICP/Cycles rate for the IC network changes dynamically and is pegged to the XDR value, 1 XDR = 10^12 cycles (value approx. 1.4 USD).
-- - The ICP/Cycles rate for this canister is automatically formed by the market and may deviate from other markets.
-- Interaction with this canister requires your `ICP account Principal` and `Cycles wallet account Principal`, please note the difference between the two.
+- The ICP/Cycles rate on IC network changes dynamically and is pegged to the XDR value, 1 XDR = 10^12 cycles (value approx. 1.4 USD).
+- - The ICP/Cycles rate on this canister is automatically formed by the market and may deviate from other markets.
+- Your `ICP account principal` and `Cycles wallet account principal` are used to interact with this canister, please note the difference between them.
 
 ### Query ICP/Cycles price
 ````
@@ -84,7 +84,7 @@ Step2: Send ICP to `DepositAccountId`
 dfx ledger --network ic transfer <your_DepositAccountId> --memo 0 --e8s <icp_e8s_amount>
 ````
 
-Step3: Converting to Cycles. Parameters `icp_e8s_amount` enter the amount sent in Step2 and `your_cycles_wallet_principal` enter the principal of your cycles wallet (note: not your ICP account principal).
+Step3: Converting to Cycles. Parameters `icp_e8s_amount` is the amount sent in Step2 and `your_cycles_wallet_principal` is the principal of your cycles wallet (note: not your ICP account principal).
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai icpToCycles '(<icp_e8s_amount>:nat,principal "<your_cycles_wallet_principal>",null)'
 ````
@@ -104,7 +104,7 @@ Return `CallArgs`(example)
 blob "DIDL\02n\01m{\02h\00\01\**************\88\01\e1\18\fd6G\02\00"
 ````
 
-Step2: Converting to ICP. The parameter `cycles_amount` enters the amount of cycles you want to convert, and the parameter `call_args` enters the `CallArgs` obtained from Step1.
+Step2: Converting to ICP. The parameter `cycles_amount` is the amount of cycles you want to convert, and the parameter `call_args` is the `CallArgs` got from Step1. 
 ````
 dfx canister --network ic call <your_cycles_wallet_principal> wallet_call '(record {canister=principal "ium3d-eqaaa-aaaak-aab4q-cai"; method_name="cyclesToIcp"; cycles=<cycles_amount>:nat64; args=<call_args>})'
 ````
@@ -115,7 +115,7 @@ dfx ledger --network ic balance
 
 ### Add liquidity
 
-To add liquidity, both ICP and Cycles need to be added to the liquidity pool, the proportion is calculated based on the current price and the excess is returned.
+To add liquidity, both ICP and Cycles to be added to the liquidity pool, the proportion is calculated based on the current price and the excess will refunded.
 
 Step1: Get your dedicated ICP deposit account-id（**DepositAccountId**）
 ````
@@ -140,16 +140,16 @@ Return `CallArgs`(example)
 blob "DIDL\02n\01m{\02h\00\01\**************\88\01\e1\18\fd6G\02\00"
 ````
 
-Step4: Send Cycles, add liquidity. You need to fill in the amount of Cycles to be sent and fill in the `CallArgs` obtained from Step3.
+Step4: Send Cycles, add liquidity. The parameter `cycles_amount` is the amount of cycles you want to add, and the parameter `call_args` is the `CallArgs` got from Step3.
 ````
 dfx canister --network ic call <your_cycles_wallet_principal> wallet_call '(record {canister=principal "ium3d-eqaaa-aaaak-aab4q-cai"; method_name="add"; cycles=<cycles_amount>:nat64; args=<call_args>})'
 ````
 
-Step5: Enquire about holding liquidity shares
+Step5: Enquire about liquidity shares
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt principal "<your_icp_account_principal>")'
 ````
-Return (example). The `share` (or `2_082_268_383`) field indicates the share of liquidity you hold.
+Return (example). The `share` (or `2_082_268_383`) field is the share of liquidity you hold.
 ````
 (
   record {
@@ -183,7 +183,7 @@ Step1: Query your liquidity share, the `share` (or `2_082_268_383`) field in the
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai liquidity '(opt principal "<your_icp_account_principal>")'
 ````
 
-Step2: Remove liquidity. The parameter `share_amount` must be equal to or less than the value queried by Step1, and the parameter `your_cycles_wallet_principal` is wallet principal used to receive the cycles.
+Step2: Remove liquidity. The parameter `share_amount` must be equal to or less than the value queried by Step1, and the parameter `your_cycles_wallet_principal` is wallet principal used to receive the cycles, and caller  principal will receive icp.
 
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai remove '(<share_amount>:nat, principal "<your_cycles_wallet_principal>", null)'
@@ -196,7 +196,7 @@ dfx wallet --network ic balance
 
 ### Claim Rewards
 
-Claim Returns. Specifying `your_cycles_wallet_principal`
+Claim Returns. The parameter `your_cycles_wallet_principal` is wallet principal used to receive cycles, and caller principal will receive icp.
 ````
 dfx canister --network ic call ium3d-eqaaa-aaaak-aab4q-cai claimReturns '(principal "<your_cycles_wallet_principal>", null)'
 ````
