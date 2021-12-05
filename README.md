@@ -2,7 +2,7 @@
 
 ### Disclaimers.
 
-**This project is in beta and may have defects.  It‘s a Dapp, please be knowledgeable and participate voluntarily and at your own risk.**
+**This project is in beta and may have defects.  It‘s a Dapp, please be knowledgeable and participate voluntarily at your own risk.**
 
 ##  Overview
 
